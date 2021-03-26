@@ -1,1 +1,1 @@
-# SQL_practice_log
+# Python_practice_log
