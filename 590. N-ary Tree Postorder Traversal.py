@@ -9,20 +9,21 @@ class Node:
 class Solution:
     def postorder(self, root: 'Node') -> List[int]:
         # iteration
-        # stack = [root]
-        # res = []
-        # while len(stack):
-        #     node = stack.pop()
-        #     res.append(node.val)
-        #     stack.extend(node.children or [])
-        # return res[::-1]
+        if not root: return []
+        stack = [root]
+        res = []
+        while len(stack):
+            node = stack.pop()
+            res.append(node.val)
+            stack.extend(node.children or [])
+        return res[::-1]
         
         # recursion
-        def rec(node):
-            if node:
-                for child in node.children:   
-                    rec(child)
-                res.append(node.val)
-        res = []        
-        rec(root)
-        return res
+        # def rec(node):
+        #     if node:
+        #         for child in node.children:   
+        #             rec(child)
+        #         res.append(node.val)
+        # res = []        
+        # rec(root)
+        # return res
