@@ -17,12 +17,26 @@ class Solution:
 #             self.dfs(root.right, res)
 #             res.append(root.val)
         
-        # iteration
-        res, stack = [], [root]
+        # # iteration
+        # ## 1.
+        # res, stack = [], [root]
+        # while stack:
+        #     node = stack.pop()
+        #     if node:
+        #         res.append(node.val)
+        #         stack.append(node.left)
+        #         stack.append(node.right)
+        # return res[::-1]
+    
+        ## 2.
+        res, stack = [], [(root, False)]
         while stack:
-            node = stack.pop()
+            node, visited = stack.pop()
             if node:
-                stack.append(node.left)
-                stack.append(node.right)
-                res.append(node.val)
-        return res[::-1]
+                if visited:
+                    res.append(node.val)
+                else:
+                    stack.append((node, True))
+                    stack.append((node.right, False))
+                    stack.append((node.left, False))
+        return res
