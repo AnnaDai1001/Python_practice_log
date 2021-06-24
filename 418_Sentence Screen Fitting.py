@@ -20,3 +20,5 @@ class Solution:
     
     return total_len // n
       
+# Time complexity : O(rows*longest length of word)
+
