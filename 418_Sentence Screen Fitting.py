@@ -22,3 +22,6 @@ class Solution:
       
 # Time complexity : O(rows*longest length of word)
 
+class Solution:
+  def wordsTyping(self, sentence, rows, cols): # how to use brute force
+    
