@@ -1,0 +1,108 @@
+175. Combine two tables
+select p.first_name, p.last_name, a.state, a.city
+from person p left join address a on p.personid=a.personid
+;
+
+176. Second highest salary
+#1
+select max(salary) as Secondhighestsalary
+from employee
+where salary < (select max(salary) from employee)
+;
+#2
+select salary as shs
+from employee
+order by salary desc
+limit 1,1
+;
+#3
+select distinct(salary) as shs
+from (select salary, dense_rank() over(order by salary desc) as rk from employee) temp
+where rk = 2
+;
+
+177. Nth highest salary
+#1
+create function geththhigh(n int) returns int
+begin
+    return(
+        select if(max(salary) is null, null, max(salary))  as nthhigh
+        from (select salary, dense_rank() over(order by salary desc) as rk from employee) temp
+        where rk = n
+    );
+end
+
+#2
+create function getnthhigh(n int) returns int
+begin
+    return(
+    select distinct(e2.salary) as nthhigh
+    from employee e2
+    where n-1 = (select count(distinct e1.salary) from employee e1 where e1.salary > e2.salary)
+    );
+end
+
+
+603. Consecutive Available seats
+select seat_id 
+from
+cinema
+where free = 1 and
+(seat_id-1 in (select seat_id from cinema where free = 1) 
+or seat_id+1 in (select seat_id from cinema where free = 1) 
+)
+order by seat_id
+;
+
+
+# An Amazon DE SQL Question
+STREAMS
+Stream_date  Customer_id  Content_ID   Marketplace_ID   device_type
+2012-02-01   12345        SRT123          US             ipad     
+2012-02-01   67890        SRT123          UK             TV
+2012-02-01   98765        XYZ123          US             iphone
+
+Content
+Content_ID    KIDS_CONTENT       Content_type
+SRT123           Y                series
+XYZ123           N                movie
+ABC123           Y                movie
+
+1. Write a query to get the number of unique kid friendly titles that were streamed last month
+2. Customers who watched kids friendly movie but never watched any Series
+3. Write a query to get a list of all customers who watched at least a one kid friendly movie every week in last 3 months
+
+#1
+select count(distinct s.content_id) as kf_count
+from streams s join content c on s.content_id = c.content_id
+where c.kids_content = 'Y' and s.stream_date <= dateadd(day, -30, getdate())
+;
+
+#2
+select distinct s.customer_id
+from streams s
+where s.customer_id in (select s01.customer_id from streams s01 join content c01 on s01.content_id = c01.content_id where c01.kids_content = 'Y' and c01.content_type = 'movie')
+and s.customer_id not in (select s02.customer_id from streams s02 join content c02 on s02.content_id = c02.content_id where c02.content_type = 'series')
+;
+
+#3
+with weekly_data as(
+    select customer_id, date_trunc('week', stream_date) as week
+    from streams s join content c on s.content_id = c.content_id
+    where c.kids_content = 'Y' and s.stream_date <= dateadd(month, -3, getdate())
+),
+weekly_dim as(
+    select generate_series(dateadd(month, -3, getdate()), getdate(), interval '1 week') as week 
+)
+
+select customer_id
+from weekly_data
+group by 1
+having count(distinct week) = (select count(*) from weekly_dim)
+;
+
+
+
+
+
+
